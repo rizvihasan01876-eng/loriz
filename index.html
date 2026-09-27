@@ -72,7 +72,7 @@
   <script>
     // Route the app's Apps Script API calls to the current deployment.
     (() => {
-      const deploymentUrl = "https://script.google.com/macros/s/AKfycbx1Xefv0-SK5k9FWKFMUw4rkBQZ-V3o7jfEzyZfnTpABYoIFzad53ZV4P8Ve-uAyRDp/exec";
+      const deploymentUrl = "https://script.google.com/macros/s/AKfycbxFCMl8gZycBqhw_syX7lTBChn_owBmx1U678FiprRgnelfSiYr7UXqBfQHDFM771BD/exec";
       const nativeFetch = window.fetch.bind(window);
       window.fetch = (input, init) => {
         const requestedUrl = input instanceof Request ? input.url : String(input);
@@ -155,7 +155,8 @@
           <section class="panel product-editor"><div class="product-editor-title"><h2 id="productFormTitle">Add a product</h2><button class="button button-secondary" id="cancelProductEdit" type="button" hidden>Cancel edit</button></div><form id="productForm"><div class="field-grid">
             <div class="field full"><label for="catalogProductName">Product Name <span class="required">*</span></label><input class="control" id="catalogProductName" required maxlength="120" placeholder="Enter product name"></div>
             <div class="field"><label for="catalogProductPrice">Product Price (৳) <span class="required">*</span></label><input class="control" id="catalogProductPrice" type="number" min="0" step="0.01" required placeholder="Enter price"></div>
-            <div class="field"><label for="catalogProductImage">Product Image (Google Drive link)</label><input class="control" id="catalogProductImage" type="url" placeholder="Paste a shareable image link"><div class="field-hint">Set Drive access to “Anyone with the link”.</div></div>
+            <div class="field"><label for="catalogProductImage">Product Image (Google Drive link)</label><input class="control" id="catalogProductImage" type="url" placeholder="Paste a shareable image link"><div class="field-hint">Or upload an image below; it will be saved to Drive for all devices.</div></div>
+            <div class="field"><label for="catalogProductImageFile">Upload Product Image</label><input class="control file-control" id="catalogProductImageFile" type="file" accept="image/png,image/jpeg,image/webp,image/gif"><div class="field-hint">Optional · PNG, JPG, WEBP or GIF, up to 1 MB.</div></div>
           </div><button class="button button-primary" id="saveProductButton" type="submit">Save Product</button></form></section>
           <section class="panel"><div class="panel-heading"><h2>Product catalog</h2><span class="field-hint">Synced across devices</span></div><div class="product-list" id="productList"></div></section>
         </section>
@@ -359,6 +360,7 @@
       editingProductId=id;document.getElementById('catalogProductName').value=item.name;
       document.getElementById('catalogProductPrice').value=item.price??'';
       document.getElementById('catalogProductImage').value=item.imageUrl||'';
+      document.getElementById('catalogProductImageFile').value='';
       document.getElementById('productFormTitle').textContent='Edit product';
       document.getElementById('saveProductButton').textContent='Update Product';
       document.getElementById('cancelProductEdit').hidden=false;
@@ -369,13 +371,16 @@
       const name=document.getElementById('catalogProductName').value.trim();
       const priceInput=document.getElementById('catalogProductPrice');
       const imageUrl=document.getElementById('catalogProductImage').value.trim();
+      const imageFile=document.getElementById('catalogProductImageFile').files[0];
       const price=Number(priceInput.value);
       if(!name){document.getElementById('catalogProductName').focus();return}
       if(priceInput.value===''||!Number.isFinite(price)||price<0){priceInput.focus();priceInput.reportValidity();return}
+      if(imageFile&&imageFile.size>1024*1024){showToast('Product image must be 1 MB or smaller.','error');return}
       const wasEditing=Boolean(editingProductId),saveButton=document.getElementById('saveProductButton');
       saveButton.disabled=true;
       try{
-        await productApi({action:wasEditing?'updateProduct':'createProduct',id:editingProductId||'',name,price,imageUrl});
+        const imageData=imageFile?await new Promise((resolve,reject)=>{const reader=new FileReader();reader.onload=()=>resolve(reader.result);reader.onerror=()=>reject(new Error('Could not read the product image.'));reader.readAsDataURL(imageFile)}):'';
+        await productApi({action:wasEditing?'updateProduct':'createProduct',id:editingProductId||'',name,price,imageUrl,imageData});
         await refreshProductCatalog(false);
         if(productSelect.value&&productSelect.value!=='__other__')productSelect.dispatchEvent(new Event('change'));
         resetProductEditor();
