@@ -72,7 +72,7 @@
   <script>
     // Route the app's Apps Script API calls to the current deployment.
     (() => {
-      const deploymentUrl = "https://script.google.com/macros/s/AKfycby_7r03M2ZXt85sGX8rUbrefTl-SY5f44j7xtfiOKjzp0QuyvSxZusiyHIjWMbgWaXH/exec";
+      const deploymentUrl = "https://script.google.com/macros/s/AKfycbx1Xefv0-SK5k9FWKFMUw4rkBQZ-V3o7jfEzyZfnTpABYoIFzad53ZV4P8Ve-uAyRDp/exec";
       const nativeFetch = window.fetch.bind(window);
       window.fetch = (input, init) => {
         const requestedUrl = input instanceof Request ? input.url : String(input);
@@ -157,7 +157,7 @@
             <div class="field"><label for="catalogProductPrice">Product Price (৳) <span class="required">*</span></label><input class="control" id="catalogProductPrice" type="number" min="0" step="0.01" required placeholder="Enter price"></div>
             <div class="field"><label for="catalogProductImage">Product Image (Google Drive link)</label><input class="control" id="catalogProductImage" type="url" placeholder="Paste a shareable image link"><div class="field-hint">Set Drive access to “Anyone with the link”.</div></div>
           </div><button class="button button-primary" id="saveProductButton" type="submit">Save Product</button></form></section>
-          <section class="panel"><div class="panel-heading"><h2>Product catalog</h2><span class="field-hint">Saved in this browser</span></div><div class="product-list" id="productList"></div></section>
+          <section class="panel"><div class="panel-heading"><h2>Product catalog</h2><span class="field-hint">Synced across devices</span></div><div class="product-list" id="productList"></div></section>
         </section>
         <section class="page" id="page-members">
           <div class="page-heading"><div><div class="eyebrow">Team workspace</div><h1>Add Member</h1><p>Create a member profile while keeping the current admin account unchanged.</p></div></div>
@@ -220,18 +220,28 @@
     const toast = document.getElementById('toast');
     let localOrders = [];
     let editingOrderId = null;
-    const PRODUCT_STORAGE_KEY = 'lorizProductCatalog';
-    const defaultProducts = [
-      {id:'loriz-vitamin-c',name:'LO\'RIZ Vitamin C Brightening Face Serum',price:'',imageUrl:''},
-      {id:'loriz-marula',name:'LO\'RIZ Marula Face Serum',price:'',imageUrl:''},
-      {id:'loriz-alpha',name:'LO\'RIZ Alpha Internal Part Whitening Cream',price:'',imageUrl:''}
-    ];
-    let productCatalog;
-    try {
-      const savedProducts = JSON.parse(localStorage.getItem(PRODUCT_STORAGE_KEY) || 'null');
-      productCatalog = Array.isArray(savedProducts) ? savedProducts : defaultProducts;
-    } catch { productCatalog = defaultProducts; }
+    let productCatalog = [];
     let editingProductId = null;
+    async function productApi(payload){
+      const response=await fetch(payload?API_URL:`${API_URL}?action=products`,payload?{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(payload)}:undefined);
+      const result=await response.json();
+      if(!response.ok||result.success!==true)throw new Error(result.message||'Unable to sync the product catalog.');
+      return result;
+    }
+    async function migrateLegacyProducts(){
+      const legacyKey='lorizProductCatalog';
+      if(window.lorizStaff?.role!=='admin')return false;
+      let legacyProducts;
+      try{legacyProducts=JSON.parse(localStorage.getItem(legacyKey)||'null')}catch{return false}
+      if(!Array.isArray(legacyProducts)||!legacyProducts.length)return false;
+      for(const item of legacyProducts){
+        const name=String(item?.name||'').trim(),price=Number(item?.price);
+        if(!name||item.price===''||!Number.isFinite(price)||price<0)continue;
+        await productApi({action:'createProduct',name,price,imageUrl:String(item.imageUrl||'').trim()});
+      }
+      localStorage.removeItem(legacyKey);
+      return true;
+    }
     let toastTimer;
     const money = value => new Intl.NumberFormat('en-BD',{minimumFractionDigits:2,maximumFractionDigits:2}).format(Number(value)||0);
     const safe = value => String(value ?? '').replace(/[&<>"']/g, character => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[character]));
@@ -304,9 +314,24 @@
         ()=>{productImagePreview.classList.remove('visible');if(productImageUrl.value.trim())showToast('Image could not be loaded. Check that the Google Drive file is shared with anyone who has the link.','error')}
       );
     }
-    function saveProductCatalog(){
-      try{localStorage.setItem(PRODUCT_STORAGE_KEY,JSON.stringify(productCatalog));return true}
-      catch{showToast('Could not save products in this browser. Check available storage.','error');return false}
+    async function refreshProductCatalog(showError=true){
+      try{
+        let result=await productApi();
+        if(Array.isArray(result.products)&&!result.products.length){
+          const migrated=await migrateLegacyProducts();
+          if(migrated)result=await productApi();
+        }
+        productCatalog=Array.isArray(result.products)?result.products:[];
+        renderProductOptions();renderProductCatalog();
+        if(productSelect.value&&!productCatalog.some(item=>item.id===productSelect.value)&&productSelect.value!=='__other__'){
+          productSelect.value='';productSelect.dispatchEvent(new Event('change'));
+        }
+        return true;
+      }catch(error){
+        document.getElementById('productList').innerHTML=`<div class="table-empty">${safe(error.message||'Unable to load products.')}</div>`;
+        if(showError)showToast(error.message||'Unable to load products.','error');
+        return false;
+      }
     }
     function renderProductOptions(){
       const selected=productSelect.value;
@@ -339,7 +364,7 @@
       document.getElementById('cancelProductEdit').hidden=false;
       document.getElementById('catalogProductName').focus();
     }
-    document.getElementById('productForm').addEventListener('submit',event=>{
+    document.getElementById('productForm').addEventListener('submit',async event=>{
       event.preventDefault();
       const name=document.getElementById('catalogProductName').value.trim();
       const priceInput=document.getElementById('catalogProductPrice');
@@ -347,33 +372,36 @@
       const price=Number(priceInput.value);
       if(!name){document.getElementById('catalogProductName').focus();return}
       if(priceInput.value===''||!Number.isFinite(price)||price<0){priceInput.focus();priceInput.reportValidity();return}
-      const duplicate=productCatalog.some(item=>item.name.toLowerCase()===name.toLowerCase()&&item.id!==editingProductId);
-      if(duplicate){showToast('A product with that name already exists.','error');return}
-      const wasEditing=Boolean(editingProductId);
-      if(editingProductId){productCatalog=productCatalog.map(item=>item.id===editingProductId?{...item,name,price,imageUrl}:item)}
-      else productCatalog.push({id:`product-${Date.now()}-${Math.random().toString(36).slice(2,8)}`,name,price,imageUrl});
-      if(!saveProductCatalog())return;
-      renderProductCatalog();renderProductOptions();
-      if(productSelect.value&&productSelect.value!=='__other__')productSelect.dispatchEvent(new Event('change'));
-      resetProductEditor();
-      showToast(wasEditing?'Product updated.':'Product added.','success');
+      const wasEditing=Boolean(editingProductId),saveButton=document.getElementById('saveProductButton');
+      saveButton.disabled=true;
+      try{
+        await productApi({action:wasEditing?'updateProduct':'createProduct',id:editingProductId||'',name,price,imageUrl});
+        await refreshProductCatalog(false);
+        if(productSelect.value&&productSelect.value!=='__other__')productSelect.dispatchEvent(new Event('change'));
+        resetProductEditor();
+        showToast(wasEditing?'Product updated.':'Product added.','success');
+      }catch(error){showToast(error.message||'Unable to save product.','error')}
+      finally{saveButton.disabled=false}
     });
     document.getElementById('cancelProductEdit').addEventListener('click',resetProductEditor);
-    document.getElementById('productList').addEventListener('click',event=>{
+    document.getElementById('productList').addEventListener('click',async event=>{
       const button=event.target.closest('[data-product-action]');if(!button)return;
       const productAction=button.dataset.productAction,id=button.dataset.productId;
       if(productAction==='edit'){editCatalogProduct(id);return}
       const item=productCatalog.find(product=>product.id===id);if(!item)return;
       if(!window.confirm(`Delete “${item.name}” from the product catalog?`))return;
       const wasSelected=productSelect.value===id;
-      productCatalog=productCatalog.filter(product=>product.id!==id);
-      if(!saveProductCatalog())return;
-      renderProductCatalog();renderProductOptions();
-      if(editingProductId===id)resetProductEditor();
-      if(wasSelected){productSelect.value='';document.getElementById('productPrice').value='';productImageUrl.value='';updateProductImagePreview();updateSummary()}
-      showToast('Product deleted.','info');
+      button.disabled=true;
+      try{
+        await productApi({action:'deleteProduct',id});
+        await refreshProductCatalog(false);
+        if(editingProductId===id)resetProductEditor();
+        if(wasSelected){productSelect.value='';document.getElementById('productPrice').value='';productImageUrl.value='';updateProductImagePreview();updateSummary()}
+        showToast('Product deleted.','info');
+      }catch(error){button.disabled=false;showToast(error.message||'Unable to delete product.','error')}
     });
-    renderProductOptions();renderProductCatalog();
+    renderProductOptions();
+    refreshProductCatalog(false);
 
     function showToast(message,type='success'){
       clearTimeout(toastTimer);toast.className=`toast ${type} show`;document.getElementById('toastMessage').textContent=message;document.getElementById('toastIcon').textContent=type==='success'?'✓':type==='error'?'!':'·';
