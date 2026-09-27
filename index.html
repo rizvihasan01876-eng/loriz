@@ -148,7 +148,26 @@
   <div class="toast" id="toast" role="status" aria-live="polite"><span class="toast-icon" id="toastIcon">✓</span><span id="toastMessage"></span></div>
   <div class="modal-backdrop" id="successModal" role="dialog" aria-modal="true" aria-labelledby="successTitle"><div class="success-modal"><div class="success-check">✓</div><h2 id="successTitle">Order Created Successfully</h2><p>The order has been successfully added to the LO'RIZ order system.</p><div class="success-detail"><div><span>Order ID</span><strong id="successOrderId">—</strong></div><div><span>Total Amount</span><strong id="successTotal">৳0.00</strong></div></div><div class="modal-actions"><button class="button button-secondary" id="anotherOrder">Create Another Order</button><button class="button button-primary" id="viewOrders">View Orders</button></div></div></div>
   <script>
-    const API_URL = "https://script.google.com/macros/s/AKfycbwnLyRHgocULIpMA56jxrGjgb0yUnXJyDf-I36yBT1s0f2PqqMJtbKz8Q4Fm0wPkYc/exec";
+    const API_URL = "https://script.google.com/macros/s/AKfycbyNj4ByO8wKhIjkDFsjfXsdEjKvTUhOoqD5m8-KYzg0Xd2-ih2u031-e_jnDRr8HKMT/exec";
+    const ROLE_SESSION_KEY = 'lorizStaffSession';
+    window.lorizStaff = JSON.parse(localStorage.getItem(ROLE_SESSION_KEY) || 'null');
+    const nativeApiFetch = window.fetch.bind(window);
+    window.fetch = function(input, init) {
+      const options = Object.assign({}, init || {});
+      let requestUrl = typeof input === 'string' ? input : input.url;
+      if (!requestUrl || requestUrl.indexOf(API_URL) !== 0) return nativeApiFetch(input, init);
+      const staff = window.lorizStaff;
+      const method = String(options.method || (input && input.method) || 'GET').toUpperCase();
+      if (method === 'GET' && staff) {
+        const url = new URL(requestUrl);
+        url.searchParams.set('actorName', staff.name);
+        url.searchParams.set('actorPin', staff.pin);
+        requestUrl = url.toString();
+      } else if (method !== 'GET' && typeof options.body === 'string' && staff) {
+        try { options.body = JSON.stringify(Object.assign(JSON.parse(options.body), {actorName:staff.name, actorPin:staff.pin})); } catch (error) {}
+      }
+      return nativeApiFetch(requestUrl, options);
+    };
     const BRAND_LOGO_URL = "https://drive.google.com/file/d/1KSXeQL4GJaYvFXBsgBnsGf7ckJFZOcxW/view?usp=sharing";
 
     const ORDERS_API_URL = API_URL;
@@ -511,6 +530,165 @@
     const resetButton=document.getElementById('resetButton');if(resetButton)resetButton.addEventListener('click',()=>showToast('Order form cleared.','info'));
 
     const now=new Date();document.getElementById('headerDate').textContent=new Intl.DateTimeFormat('en',{weekday:'short',day:'numeric',month:'short',year:'numeric'}).format(now);document.getElementById('dashboardDate').textContent=new Intl.DateTimeFormat('en',{day:'numeric',month:'long',year:'numeric'}).format(now);const hour=now.getHours();document.getElementById('greeting').textContent=`Good ${hour<12?'morning':hour<17?'afternoon':'evening'}, Admin`;updateSummary();updateDashboard();refreshOrders(false);
+  </script>
+  <script>
+    (function installRoleInterface() {
+      const endpoint = "https://script.google.com/macros/s/AKfycbwnLyRHgocULIpMA56jxrGjgb0yUnXJyDf-I36yBT1s0f2PqqMJtbKz8Q4Fm0wPkYc/exec";
+      const sessionKey = 'lorizStaffSession';
+      const staff = window.lorizStaff;
+      const roleStyle = document.createElement('style');
+      roleStyle.textContent = `#roleGate{position:fixed;inset:0;z-index:10000;display:grid;place-items:center;padding:24px;background:radial-gradient(ellipse at 15% 15%,#eee8fb 0,transparent 38%),radial-gradient(ellipse at 90% 85%,#f2e8e4 0,transparent 34%),#f8f7f5;font-family:'Manrope',sans-serif;color:#252321}#roleGate:before{content:'';position:absolute;inset:0;pointer-events:none;opacity:.22;background-image:radial-gradient(#8b7d9e 0.6px,transparent 0.6px);background-size:18px 18px}#roleGate .role-card{position:relative;display:grid;grid-template-columns:1fr 1fr;width:min(100%,820px);min-height:490px;overflow:hidden;background:#fff;border:1px solid #e9e2dc;border-radius:22px;box-shadow:0 28px 90px #33265022}#roleGate .role-brand{position:relative;display:flex;flex-direction:column;justify-content:space-between;overflow:hidden;padding:38px;background:linear-gradient(145deg,#271457,#4823a0 62%,#7659bd);color:#fff}#roleGate .role-brand:before,#roleGate .role-brand:after{content:'';position:absolute;border:1px solid #ffffff20;border-radius:50%;pointer-events:none}#roleGate .role-brand:before{width:370px;height:370px;right:-190px;top:-115px}#roleGate .role-brand:after{width:250px;height:250px;right:-95px;top:-55px}#roleGate .role-mark{position:relative;z-index:1;font-size:24px;font-weight:800;letter-spacing:3px}#roleGate .role-mark small{display:block;margin-top:3px;font-size:9px;letter-spacing:2.3px;color:#e1d8f3}#roleGate .role-welcome{position:relative;z-index:1;margin:25px 0}#roleGate .role-kicker{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:#d7c9fa;font-weight:800}#roleGate .role-welcome h2{max-width:300px;margin:12px 0;font-size:30px;line-height:1.2;letter-spacing:-.8px}#roleGate .role-welcome p{max-width:300px;margin:0;color:#e2dcf0;font-size:12px;line-height:1.8}#roleGate .role-brand-foot{position:relative;z-index:1;color:#ded5f2;font-size:10px}#roleGate .role-form-side{display:flex;align-items:center;padding:42px}#roleGate .role-form-wrap{width:100%;max-width:320px;margin:auto}#roleGate .role-form-wrap h3{margin:0 0 7px;font-size:22px;letter-spacing:-.5px}#roleGate .role-form-wrap>p{margin:0 0 24px;color:#77716c;font-size:11px;line-height:1.6}#roleGate label{display:block;margin:15px 0 6px;font-size:10px;font-weight:800;color:#514d49}#roleGate input{width:100%;height:45px;padding:0 12px;border:1px solid #e5e0dc;border-radius:9px;background:#fcfbfa;color:#252321;font:inherit;font-size:12px;transition:border .2s,box-shadow .2s}#roleGate input:focus{outline:none;border-color:#421c99;box-shadow:0 0 0 3px #421c9918}#roleGate button{width:100%;height:45px;margin-top:22px;border:0;border-radius:9px;background:#252321;color:#fff;font:inherit;font-size:12px;font-weight:800;transition:background .2s,transform .2s}#roleGate button:hover{background:#421c99}#roleGate button:active{transform:translateY(1px)}#roleGate button:disabled{opacity:.65;cursor:wait}#roleGate .role-error{min-height:18px;margin-top:10px;color:#a7635c;font-size:10px}#staffAdminPanel{margin-top:16px}#staffAdminPanel .staff-list{margin-top:15px}#staffAdminPanel .staff-entry{padding:10px 0;border-bottom:1px solid #F0EBE7;font-size:12px}#staffAdminPanel .staff-entry span{float:right;color:#77716C;font-size:10px;text-transform:capitalize}@media(max-width:640px){#roleGate{padding:14px}#roleGate .role-card{grid-template-columns:1fr;max-width:440px;min-height:0;border-radius:17px}#roleGate .role-brand{min-height:170px;padding:22px 24px}#roleGate .role-mark{font-size:19px}#roleGate .role-welcome{margin:18px 0 0}#roleGate .role-welcome h2{font-size:22px;margin:7px 0}#roleGate .role-welcome p{font-size:10px}#roleGate .role-brand-foot{display:none}#roleGate .role-form-side{padding:24px}#roleGate .role-form-wrap h3{font-size:20px}#roleGate .role-form-wrap>p{margin-bottom:15px}}`;
+      document.head.appendChild(roleStyle);
+      const loginStyle = document.createElement('style');
+      loginStyle.textContent = `#roleGate{background:#f7f5fa;font-family:'Manrope',sans-serif;color:#292522}#roleGate:before{content:'';inset:auto auto 8% 8%;width:210px;height:210px;border:1px solid #e4dced;border-radius:50%;background:#f0ebf6;opacity:.7;box-shadow:0 0 0 28px #f8f6fa,0 0 0 29px #e8e0f0}#roleGate:after{content:'';position:absolute;right:8%;top:8%;width:150px;height:150px;border:1px solid #e4d6ca;border-radius:50%;background:#f2e9e2;opacity:.65;pointer-events:none}#roleGate .role-card{z-index:1;display:block;width:min(100%,430px);min-height:0;padding:34px 42px 25px;overflow:hidden;background:#fff;border:1px solid #eee6df;border-radius:20px;box-shadow:0 16px 48px rgba(61,45,36,.08)}#roleGate .role-brand{display:flex;align-items:center;justify-content:center;overflow:visible;padding:0;background:transparent;color:#292522;text-align:center}#roleGate .role-brand:before,#roleGate .role-brand:after{display:none}#roleGate .role-mark{color:#292522;font-size:22px;letter-spacing:3px}#roleGate .role-mark small{color:#88766c}#roleGate .role-brand img{width:min(220px,100%)!important;height:92px!important;object-position:center!important;margin:0 auto 18px!important}#roleGate .role-welcome{display:none}#roleGate .role-brand-foot{margin:0 0 19px;color:#8b817a;font-size:9px;letter-spacing:.25px;text-align:center}#roleGate .role-form-side{display:block;padding:0}#roleGate .role-form-wrap{max-width:none;margin:0}#roleGate .role-form-wrap h3{margin:0;text-align:center;color:#292522;font-size:23px;font-weight:700;letter-spacing:-.6px}#roleGate .role-form-wrap>p{margin:6px 0 23px;color:#827a74;text-align:center;font-size:11px}#roleGate label{margin:15px 0 7px;color:#504943;font-size:10px;font-weight:700}#roleGate input{height:46px;padding:0 13px;border:1px solid #e7dfd9;border-radius:9px;background:#fdfcfb;color:#292522;font-size:12px}#roleGate input:focus{border-color:#967568;box-shadow:0 0 0 3px #96756820}#roleGate button{height:46px;margin-top:19px;border-radius:9px;background:#76584e;font-size:11px;letter-spacing:.25px}#roleGate button:hover{background:#62473f}#roleGate .role-error{margin-top:10px;color:#a7635c;font-size:10px}#roleGate .pin-field-wrap{position:relative}#roleGate .pin-field-wrap input{padding-right:48px}#roleGate .password-toggle{position:absolute;top:50%;right:7px;width:34px;height:34px;margin:0;padding:0;border:0;background:transparent;color:#857970;transform:translateY(-50%)}#roleGate .password-toggle:hover{background:#f4efeb;color:#62473f}#roleGate .password-toggle svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}#roleGate .forgot-link{display:block;width:auto;height:auto;margin:10px 0 0 auto;padding:0;border:0;background:transparent;color:#76584e;text-align:right;font-size:10px;font-weight:700}#roleGate .forgot-link:hover{background:transparent;text-decoration:underline}#roleGate .role-form-wrap form>button[type=submit]{margin-top:18px}@media(max-width:640px){#roleGate{padding:18px}#roleGate:before{width:140px;height:140px;left:-65px;bottom:8%}#roleGate:after{width:110px;height:110px;right:-40px;top:7%}#roleGate .role-card{max-width:410px;padding:30px 25px 21px;border-radius:17px}#roleGate .role-brand img{height:82px!important;margin-bottom:14px!important}#roleGate .role-brand-foot{margin-bottom:17px}}`;
+      document.head.appendChild(loginStyle);
+      const brandLoginStyle = document.createElement('style');
+      brandLoginStyle.textContent = `#roleGate{background:#f4f0fa;color:#252321}#roleGate:before{background:#eee8f6;border-color:#e3d9f0;box-shadow:0 0 0 28px #f4f0fa,0 0 0 29px #e9e1f2}#roleGate:after{background:#f8f5fb;border-color:#e5dced}#roleGate .role-card{background:#fff;border-color:#e8e0ef;box-shadow:0 18px 55px rgba(66,28,153,.09)}#roleGate .role-mark{color:#421c99}#roleGate .role-mark small{color:#76658f}#roleGate .role-brand-foot{color:#80778b}#roleGate .role-form-wrap h3{color:#252321}#roleGate .role-form-wrap>p{color:#77716c}#roleGate label{color:#514b5c}#roleGate input{border-color:#e2dbea;background:#fdfcff;color:#252321}#roleGate input:focus{border-color:#421c99;box-shadow:0 0 0 3px rgba(66,28,153,.14)}#roleGate button{background:#421c99;color:#fff}#roleGate button:hover{background:#351577}#roleGate button:disabled{background:#421c99}#roleGate .password-toggle{background:transparent;color:#76658f}#roleGate .password-toggle:hover{background:#f0ebfa;color:#421c99}#roleGate .forgot-link{background:transparent;color:#421c99}#roleGate .forgot-link:hover{background:transparent;color:#351577}#roleGate .role-error{color:#a7635c}@media(max-width:640px){#roleGate:before{box-shadow:0 0 0 20px #f4f0fa,0 0 0 21px #e9e1f2}}`;
+      document.head.appendChild(brandLoginStyle);
+
+      function request(url, payload) {
+        return fetch(url, payload ? {method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(payload)} : undefined).then(response => response.json());
+      }
+      function makeGate(needsSetup) {
+        if (document.getElementById('roleGate')) return;
+        const gate = document.createElement('div');
+        gate.id = 'roleGate';
+        gate.innerHTML = '<div class="role-card"><section class="role-brand"><div class="role-mark">LO\'RIZ<small>COSMETICS CARE</small></div><div class="role-welcome"><span class="role-kicker">Staff workspace</span><h2>Thoughtful beauty. Thoughtful business.</h2><p>Sign in securely to manage orders and customer care.</p></div><div class="role-brand-foot">Premium Vegan Beauty &amp; Self-Care</div></section><section class="role-form-side"><div class="role-form-wrap"><h3 id="roleFormHeading">Welcome back</h3><p id="roleGateDescription"></p><form id="roleGateForm"><div id="roleNameField"><label for="roleName">Staff name / ID</label><input id="roleName" name="name" autocomplete="username" placeholder="Enter your staff name" required maxlength="80"></div><label for="rolePin">Secure PIN</label><input id="rolePin" name="pin" type="password" inputmode="numeric" pattern="[0-9]{4,12}" autocomplete="current-password" placeholder="4–12 digit PIN" required><button id="roleGateSubmit" type="submit"></button><div class="role-error" id="roleGateError" role="alert"></div></form></div></section></div>';
+        document.body.appendChild(gate);
+        const roleBrand = gate.querySelector('.role-brand');
+        const roleMark = gate.querySelector('.role-mark');
+        const loginLogo = document.createElement('img');
+        loginLogo.alt = "LO'RIZ Cosmetics Care";
+        loginLogo.style.cssText = 'position:relative;z-index:2;display:block;width:min(190px,100%);height:72px;object-fit:contain;object-position:left center;margin-bottom:18px';
+        roleBrand.insertBefore(loginLogo, roleMark);
+        loadImageWithFallback(loginLogo, BRAND_LOGO_URL, () => { roleMark.hidden = true; }, () => { roleMark.hidden = false; });
+        const description = gate.querySelector('#roleGateDescription');
+        const heading = gate.querySelector('#roleFormHeading');
+        const button = gate.querySelector('#roleGateSubmit');
+        const nameField = gate.querySelector('#roleNameField');
+        const nameInput = gate.querySelector('#roleName');
+        const pinInput = gate.querySelector('#rolePin');
+        const brandFooter = gate.querySelector('.role-brand-foot');
+        brandFooter.textContent = '© LO\'RIZ Cosmetics Care';
+        const pinWrap = document.createElement('div');
+        pinWrap.className = 'pin-field-wrap';
+        pinInput.parentNode.insertBefore(pinWrap, pinInput);
+        pinWrap.appendChild(pinInput);
+        const visibilityButton = document.createElement('button');
+        visibilityButton.type = 'button';
+        visibilityButton.className = 'password-toggle';
+        visibilityButton.setAttribute('aria-label', 'Show password');
+        visibilityButton.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg>';
+        pinWrap.appendChild(visibilityButton);
+        visibilityButton.addEventListener('click', () => {
+          const showPin = pinInput.type === 'password';
+          pinInput.type = showPin ? 'text' : 'password';
+          visibilityButton.setAttribute('aria-label', showPin ? 'Hide password' : 'Show password');
+        });
+        const forgotLink = document.createElement('button');
+        forgotLink.type = 'button';
+        forgotLink.className = 'forgot-link';
+        forgotLink.textContent = 'Forgot Password?';
+        pinWrap.insertAdjacentElement('afterend', forgotLink);
+        forgotLink.addEventListener('click', () => {
+          gate.querySelector('#roleGateError').textContent = 'Please contact your Full Admin to reset your PIN.';
+        });
+        heading.textContent = needsSetup ? 'Set up your admin' : 'Welcome Back';
+        description.textContent = needsSetup ? 'Create the first full-admin account to secure this workspace.' : 'Sign in to continue to your account.';
+        button.textContent = needsSetup ? 'Create Admin Account' : 'Sign In';
+        nameField.querySelector('label').textContent = needsSetup ? 'Admin name' : 'Username';
+        gate.querySelector('label[for="rolePin"]').textContent = needsSetup ? 'Secure PIN' : 'Password';
+        nameInput.placeholder = needsSetup ? 'Enter your admin name' : 'Enter your staff username';
+        gate.querySelector('#roleGateForm').addEventListener('submit', async event => {
+          event.preventDefault();
+          const pin = gate.querySelector('#rolePin').value.trim();
+          const name = nameInput.value.trim();
+          const errorBox = gate.querySelector('#roleGateError');
+          button.disabled = true;
+          button.textContent = 'Please wait…';
+          try {
+            if (needsSetup) {
+              const created = await request(endpoint, {action:'bootstrapAdmin',name,pin});
+              if (!created.success) throw new Error(created.message || 'Unable to create admin.');
+            }
+            const result = await request(endpoint, {action:'auth',name,pin});
+            if (!result.success || !result.user) throw new Error(result.message || 'Sign-in failed.');
+            localStorage.setItem(sessionKey, JSON.stringify({name:result.user.name,role:result.user.role,pin}));
+            location.reload();
+          } catch (error) {
+            errorBox.textContent = error.message || 'Unable to connect. Please try again.';
+            button.disabled = false;
+            button.textContent = needsSetup ? 'Create Admin Account' : 'Sign In';
+          }
+        });
+      }
+
+      if (staff && staff.name && staff.pin) {
+        const profileName = document.querySelector('.profile-copy strong');
+        const profileRole = document.querySelector('.profile-copy span');
+        const avatar = document.querySelector('.avatar');
+        if (profileName) profileName.textContent = staff.name;
+        if (profileRole) profileRole.textContent = staff.role === 'admin' ? 'Full Admin' : 'Moderator';
+        if (avatar) { avatar.textContent = staff.name.slice(0,1).toUpperCase(); avatar.setAttribute('aria-label', staff.name); }
+        const greeting = document.getElementById('greeting');
+        if (greeting) greeting.textContent = greeting.textContent.replace(/Admin$/, staff.name);
+        const signOut = document.createElement('button');
+        signOut.type = 'button'; signOut.className = 'table-action'; signOut.textContent = 'Sign out';
+        signOut.style.cssText = 'margin-left:8px;white-space:nowrap';
+        signOut.addEventListener('click', () => { localStorage.removeItem(sessionKey); location.reload(); });
+        document.querySelector('.topbar-right').appendChild(signOut);
+
+        if (staff.role !== 'admin') {
+          const productNav = document.querySelector('.nav-item[data-page="products"]');
+          const productPage = document.getElementById('page-products');
+          if (productNav) productNav.style.display = 'none';
+          if (productPage) productPage.style.display = 'none';
+          const otherProductOption = document.querySelector('#product option[value="__other__"]');
+          if (otherProductOption) otherProductOption.disabled = true;
+          const customProductField = document.getElementById('customProductWrap');
+          if (customProductField) customProductField.style.display = 'none';
+        } else {
+          const settingsPage = document.getElementById('page-settings');
+          if (settingsPage && !document.getElementById('staffAdminPanel')) {
+            const panel = document.createElement('section');
+            panel.id = 'staffAdminPanel'; panel.className = 'panel';
+            panel.innerHTML = '<div class="panel-heading"><h2>Staff access</h2></div><p class="field-hint">Add moderator accounts. Their names and roles are stored in the Google Sheet Users tab.</p><form id="addModeratorForm"><div class="field-grid"><div class="field"><label for="newStaffName">Moderator name</label><input class="control" id="newStaffName" required maxlength="80" placeholder="Staff member name"></div><div class="field"><label for="newStaffPin">Temporary PIN</label><input class="control" id="newStaffPin" type="password" inputmode="numeric" pattern="[0-9]{4,12}" required placeholder="4–12 digits"></div></div><button class="button button-primary" type="submit" style="margin-top:14px">Add Moderator</button><div class="field-hint" id="staffAdminMessage" role="status"></div></form><div class="staff-list" id="staffList"></div>';
+            settingsPage.appendChild(panel);
+            const list = panel.querySelector('#staffList');
+            const message = panel.querySelector('#staffAdminMessage');
+            function loadStaff() {
+              request(endpoint + '?action=users').then(result => {
+                if (!result.success) throw new Error(result.message || 'Unable to load staff.');
+                list.replaceChildren();
+                result.users.forEach(user => {
+                  const entry = document.createElement('div'); entry.className = 'staff-entry';
+                  entry.textContent = user.name;
+                  const role = document.createElement('span'); role.textContent = user.role + (user.active ? '' : ' · inactive');
+                  entry.appendChild(role); list.appendChild(entry);
+                });
+              }).catch(error => { message.textContent = error.message; });
+            }
+            loadStaff();
+            panel.querySelector('#addModeratorForm').addEventListener('submit', async event => {
+              event.preventDefault();
+              const form = event.currentTarget;
+              const submit = form.querySelector('button[type="submit"]');
+              submit.disabled = true;
+              try {
+                const result = await request(endpoint, {action:'addModerator',name:form.querySelector('#newStaffName').value.trim(),pin:form.querySelector('#newStaffPin').value.trim()});
+                if (!result.success) throw new Error(result.message || 'Unable to add moderator.');
+                message.textContent = result.message;
+                form.reset();
+                loadStaff();
+              } catch (error) { message.textContent = error.message || 'Unable to add moderator.'; }
+              submit.disabled = false;
+            });
+          }
+        }
+      } else {
+        request(endpoint + '?action=authStatus').then(result => makeGate(!!result.needsSetup)).catch(() => makeGate(false));
+      }
+    })();
   </script>
 </body>
 </html>
