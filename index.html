@@ -17,7 +17,7 @@
     @media(max-width:800px){.sidebar{transform:translateX(-100%);width:260px}.sidebar.open{transform:translateX(0)}.mobile-overlay.open{display:block;position:fixed;inset:0;background:rgba(37,35,33,.28);z-index:9}.main{margin-left:0}.mobile-menu{display:grid;grid-auto-flow:column;grid-auto-columns:max-content;gap:6px;width:auto;min-width:76px;padding:0 9px;font-size:10px;font-weight:800;color:var(--ink)}.mobile-menu svg{height:17px;width:17px}.topbar{height:66px;padding:0 20px}.topbar-left{gap:10px}.top-date,.top-divider,.profile-copy{display:none}.content{padding:26px 20px 38px}.form-layout{grid-template-columns:1fr}.form-aside{grid-template-columns:1fr 1fr}.create-layout .form-aside{grid-template-columns:1fr}.create-layout .summary-card{position:static}.dashboard-bottom{grid-template-columns:1fr 1fr}}
     @media(max-width:580px){.topbar{padding:0 14px}.breadcrumb{display:none}.top-search{width:min(39vw,170px)}.topbar-right{gap:8px}.content{padding:22px 14px 32px}.page-heading{margin-bottom:20px}.page-heading h1{font-size:21px}.page-heading p{font-size:11px}.page-heading>.button{padding:9px 10px;font-size:10px}.date-chip{font-size:10px;padding:8px}.stats-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.stat-card{min-height:123px;padding:14px}.stat-value{font-size:22px;margin-top:12px}.stat-top{font-size:10px}.stat-icon{height:29px;width:29px}.dashboard-bottom{grid-template-columns:1fr}.form-card{padding:16px}.field-grid{grid-template-columns:1fr;gap:13px}.field.full{grid-column:auto}.form-aside{grid-template-columns:1fr}.form-actions{display:grid;grid-template-columns:1fr 1fr}.form-actions .button{padding:12px 9px}.create-page-header{align-items:flex-start;gap:8px;padding:10px}.create-back{font-size:9px;padding:8px 7px}.create-page-title h1{font-size:16px}.create-page-title p{font-size:9px}.create-mode{font-size:9px;padding:5px 8px}.create-layout .form-actions{grid-template-columns:1fr 1fr}.create-layout .form-actions .button{padding:10px 6px;font-size:10px}.toolbar{gap:7px}.toolbar .search-wrap{flex-basis:100%}.toolbar .filter-select,.toolbar .date-filter{flex:1;min-width:0}.settings-grid{grid-template-columns:1fr}.success-modal{padding:25px 18px}.toast{right:16px;bottom:16px}}
     @media(max-width:360px){.top-search{width:112px}.stats-grid{grid-template-columns:1fr 1fr}.stat-card{padding:12px}.stat-top{font-size:9px}.topbar-right{gap:6px}}
-    .member-page-grid{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(270px,.75fr);gap:16px;align-items:start}.member-form-panel,.member-list-panel{padding:20px}.member-fields{grid-template-columns:repeat(2,minmax(0,1fr));gap:15px 14px}.member-fields .field-hint{line-height:1.4}.member-form-actions{display:flex;align-items:center;gap:14px;margin-top:20px;padding-top:15px;border-top:1px solid var(--border)}.member-form-actions .required-note{margin:0;text-align:left}.member-list{display:grid;gap:9px}.member-entry{display:grid;grid-template-columns:42px minmax(0,1fr);align-items:center;gap:10px;padding:10px;border:1px solid #F0EBE7;border-radius:9px}.member-entry img,.member-avatar-placeholder{width:42px;height:42px;border-radius:50%;object-fit:cover;background:var(--blush)}.member-avatar-placeholder{display:grid;place-items:center;color:var(--rose);font-size:15px;font-weight:800}.member-entry-copy{min-width:0}.member-entry-copy strong,.member-entry-copy span{display:block;overflow-wrap:anywhere}.member-entry-copy strong{font-size:11px}.member-entry-copy span{margin-top:2px;color:var(--muted);font-size:9px}.member-entry-copy small{color:var(--rose);font-size:9px;font-weight:700}
+    .member-page-grid{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(270px,.75fr);gap:16px;align-items:start}.member-form-panel,.member-list-panel{padding:20px}.member-fields{grid-template-columns:repeat(2,minmax(0,1fr));gap:15px 14px}.member-fields .field-hint{line-height:1.4}.member-form-actions{display:flex;align-items:center;gap:14px;margin-top:20px;padding-top:15px;border-top:1px solid var(--border)}.member-form-actions .required-note{margin:0;text-align:left}.member-list{display:grid;gap:9px}.member-entry{display:grid;grid-template-columns:42px minmax(0,1fr) auto;align-items:center;gap:10px;padding:10px;border:1px solid #F0EBE7;border-radius:9px}.member-entry-actions{display:flex}.member-entry-actions .table-action{padding:6px 9px}.member-entry img,.member-avatar-placeholder{width:42px;height:42px;border-radius:50%;object-fit:cover;background:var(--blush)}.member-avatar-placeholder{display:grid;place-items:center;color:var(--rose);font-size:15px;font-weight:800}.member-entry-copy{min-width:0}.member-entry-copy strong,.member-entry-copy span{display:block;overflow-wrap:anywhere}.member-entry-copy strong{font-size:11px}.member-entry-copy span{margin-top:2px;color:var(--muted);font-size:9px}.member-entry-copy small{color:var(--rose);font-size:9px;font-weight:700}
     @media(max-width:800px){.member-page-grid{grid-template-columns:1fr}}
     @media(max-width:580px){.member-fields{grid-template-columns:1fr}.member-form-panel,.member-list-panel{padding:16px}.member-form-actions{align-items:flex-start;flex-direction:column}.member-form-actions .required-note{text-align:left}}
     /* Screenshot-inspired order entry layout */
@@ -72,7 +72,7 @@
   <script>
     // Route the app's Apps Script API calls to the current deployment.
     (() => {
-      const deploymentUrl = "https://script.google.com/macros/s/AKfycbwDrHp3hEblIH6v6B0lvh6Hc4hRdbxcmfCflp_gjeNoPCqwFgA-s5RluFcMJLnIej2o/exec";
+      const deploymentUrl = "https://script.google.com/macros/s/AKfycby_7r03M2ZXt85sGX8rUbrefTl-SY5f44j7xtfiOKjzp0QuyvSxZusiyHIjWMbgWaXH/exec";
       const nativeFetch = window.fetch.bind(window);
       window.fetch = (input, init) => {
         const requestedUrl = input instanceof Request ? input.url : String(input);
@@ -161,7 +161,7 @@
         </section>
         <section class="page" id="page-members">
           <div class="page-heading"><div><div class="eyebrow">Team workspace</div><h1>Add Member</h1><p>Create a member profile while keeping the current admin account unchanged.</p></div></div>
-          <div class="member-page-grid"><section class="panel member-form-panel"><div class="panel-heading"><h2>Member Information</h2></div><form id="memberForm"><div class="field-grid member-fields">
+          <div class="member-page-grid"><section class="panel member-form-panel"><div class="panel-heading"><h2 id="memberFormHeading">Member Information</h2></div><form id="memberForm"><div class="field-grid member-fields">
             <div class="field"><label for="memberName">Name <span class="required">*</span></label><input class="control" id="memberName" name="name" required maxlength="120"></div>
             <div class="field"><label for="memberEmail">Email <span class="required">*</span></label><input class="control" id="memberEmail" name="email" type="email" required maxlength="180" value="rizvihasan01876@gmail.com"></div>
             <div class="field"><label for="memberMobile">Mobile Number <span class="required">*</span></label><input class="control" id="memberMobile" name="mobile" type="tel" required maxlength="30"></div>
@@ -173,7 +173,7 @@
             <div class="field"><label for="memberPhoto">Profile Picture</label><input class="control file-control" id="memberPhoto" name="profilePicture" type="file" accept="image/png,image/jpeg,image/webp,image/gif"><div class="field-hint">Optional · PNG, JPG, WEBP or GIF, up to 1 MB.</div></div>
             <div class="field"><label for="memberPassword">Password <span class="required">*</span></label><input class="control" id="memberPassword" name="password" type="password" required minlength="8" autocomplete="new-password"></div>
             <div class="field"><label for="memberConfirmPassword">Confirm Password <span class="required">*</span></label><input class="control" id="memberConfirmPassword" type="password" required minlength="8" autocomplete="new-password"></div>
-          </div><div class="member-form-actions"><button class="button button-primary" id="createMemberButton" type="submit">Create Member</button><span class="required-note"><span>*</span> marked fields are required.</span></div></form></section>
+          </div><div class="member-form-actions"><button class="button button-primary" id="createMemberButton" type="submit">Create Member</button><button class="button button-secondary" id="cancelMemberEdit" type="button" hidden>Cancel edit</button><span class="required-note"><span>*</span> marked fields are required.</span></div></form></section>
           <section class="panel member-list-panel"><div class="panel-heading"><h2>Members</h2><button class="text-link" id="refreshMembers" type="button">Refresh</button></div><div class="member-list" id="memberList"><div class="table-empty">Loading member records…</div></div></section></div>
         </section>
         <section class="page" id="page-customers"><div class="page-heading"><div><div class="eyebrow">Our community</div><h1>Customers</h1><p>Customer details are recorded with each order.</p></div></div><div class="panel"><div class="empty-state"><div class="empty-art"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M3 20v-1a6 6 0 0 1 12 0v1M16 5.2a3.5 3.5 0 0 1 0 6.7M18 14a5 5 0 0 1 3 4.6v1"/></svg></div><h3>Customer directory</h3><p>Customer profiles will be available as your connected order system provides customer records.</p><button class="button button-secondary" data-go="orders">Browse orders</button></div></div></section>
@@ -402,14 +402,57 @@
         const response=await fetch(`${API_URL}?action=members`);
         const result=await response.json();
         if(!response.ok||result.success!==true||!Array.isArray(result.members))throw new Error(result.message||'Unable to load members.');
+        window.memberRecords=result.members;
         if(!result.members.length){list.innerHTML='<div class="table-empty">No members added yet.</div>';return}
         list.innerHTML=result.members.map(member=>{
           const photo=member.profilePicture?`<img data-image-source="${safe(member.profilePicture)}" alt="" loading="lazy">`:`<span class="member-avatar-placeholder" aria-hidden="true">${safe((member.name||'M').slice(0,1).toUpperCase())}</span>`;
-          return `<article class="member-entry">${photo}<div class="member-entry-copy"><strong>${safe(member.name)}</strong><span>${safe(member.email)} · ${safe(member.mobile)}</span><small>${safe(member.role)} · ${safe(member.team||'No Team')}</small></div></article>`;
+          return `<article class="member-entry">${photo}<div class="member-entry-copy"><strong>${safe(member.name)}</strong><span>${safe(member.email)} · ${safe(member.mobile)}</span><small>${safe(member.role)} · ${safe(member.team||'No Team')}</small></div><div class="member-entry-actions"><button class="table-action" type="button" data-member-action="edit" data-member-email="${safe(member.email)}">Edit</button></div></article>`;
         }).join('');
         loadCatalogImages(list);
       }catch(error){list.innerHTML=`<div class="table-empty">${safe(error.message||'Unable to load members.')}</div>`}
     }
+    let editingMemberEmail=null;
+    function resetMemberEditor(){
+      const memberForm=document.getElementById('memberForm');
+      memberForm.reset();editingMemberEmail=null;
+      document.getElementById('memberFormHeading').textContent='Member Information';
+      document.getElementById('createMemberButton').textContent='Create Member';
+      document.getElementById('cancelMemberEdit').hidden=true;
+      document.getElementById('memberPassword').required=true;
+      document.getElementById('memberConfirmPassword').required=true;
+      document.getElementById('memberPassword').placeholder='';
+      document.getElementById('memberConfirmPassword').placeholder='';
+      document.getElementById('memberConfirmPassword').setCustomValidity('');
+    }
+    function startMemberEdit(email){
+      const member=window.memberRecords?.find(item=>String(item.email).toLowerCase()===String(email).toLowerCase());
+      if(!member)return;
+      editingMemberEmail=member.email;
+      document.getElementById('memberName').value=member.name||'';
+      document.getElementById('memberEmail').value=member.email||'';
+      document.getElementById('memberMobile').value=member.mobile||'';
+      document.getElementById('memberAddress').value=member.address||'';
+      document.getElementById('memberRole').value=member.role||'';
+      document.getElementById('memberTeam').value=member.team||'No Team';
+      document.getElementById('memberSalary').value=member.monthlySalary??0;
+      document.getElementById('memberJoiningDate').value=member.joiningDate||'';
+      document.getElementById('memberPhoto').value='';
+      document.getElementById('memberPassword').value='';
+      document.getElementById('memberConfirmPassword').value='';
+      document.getElementById('memberPassword').required=false;
+      document.getElementById('memberConfirmPassword').required=false;
+      document.getElementById('memberPassword').placeholder='Leave blank to keep current password';
+      document.getElementById('memberConfirmPassword').placeholder='Leave blank to keep current password';
+      document.getElementById('memberFormHeading').textContent='Edit Member';
+      document.getElementById('createMemberButton').textContent='Save Changes';
+      document.getElementById('cancelMemberEdit').hidden=false;
+      document.getElementById('memberName').focus();
+    }
+    document.getElementById('memberList').addEventListener('click',event=>{
+      const button=event.target.closest('[data-member-action="edit"]');
+      if(button)startMemberEdit(button.dataset.memberEmail);
+    });
+    document.getElementById('cancelMemberEdit').addEventListener('click',resetMemberEditor);
     document.getElementById('refreshMembers').addEventListener('click',refreshMembers);
     document.getElementById('memberForm').addEventListener('submit',async event=>{
       event.preventDefault();
@@ -421,14 +464,14 @@
       try{
         if(photo)profilePicture=await new Promise((resolve,reject)=>{const reader=new FileReader();reader.onload=()=>resolve(reader.result);reader.onerror=()=>reject(new Error('Could not read the profile picture.'));reader.readAsDataURL(photo)});
         button.disabled=true;button.textContent='Creating member…';
-        const payload={action:'createMember',name:document.getElementById('memberName').value.trim(),email:document.getElementById('memberEmail').value.trim(),mobile:document.getElementById('memberMobile').value.trim(),address:document.getElementById('memberAddress').value.trim(),role:document.getElementById('memberRole').value,team:document.getElementById('memberTeam').value,monthlySalary:document.getElementById('memberSalary').value,joiningDate:document.getElementById('memberJoiningDate').value,password:password.value,profilePicture};
+        const payload={action:editingMemberEmail?'updateMember':'createMember',originalEmail:editingMemberEmail||'',name:document.getElementById('memberName').value.trim(),email:document.getElementById('memberEmail').value.trim(),mobile:document.getElementById('memberMobile').value.trim(),address:document.getElementById('memberAddress').value.trim(),role:document.getElementById('memberRole').value,team:document.getElementById('memberTeam').value,monthlySalary:document.getElementById('memberSalary').value,joiningDate:document.getElementById('memberJoiningDate').value,password:password.value,profilePicture};
         const response=await fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(payload)});
         const result=await response.json();
         if(!response.ok||result.success!==true)throw new Error(result.message||'Could not create member.');
-        memberForm.reset();confirm.setCustomValidity('');
-        await refreshMembers();showToast(result.message||'Member added successfully.','success');
-      }catch(error){showToast(error.message||'Could not create member.','error')}
-      finally{button.disabled=false;button.textContent='Create Member'}
+        resetMemberEditor();
+        await refreshMembers();showToast(result.message||'Member saved successfully.','success');
+      }catch(error){showToast(error.message||'Could not save member.','error')}
+      finally{button.disabled=false;button.textContent=editingMemberEmail?'Save Changes':'Create Member'}
     });
 
     function updateSummary(){
